@@ -1,0 +1,73 @@
+---
+title: "lookupfollowers"
+author: "Johnatas Montezuma"
+date: "10/11/2019"
+output: html_document
+---
+
+# Load followers_list
+```{r}
+followers_list <- readRDS(paste0(data_folder, "/followers_list.Rds"))
+```
+
+
+# Lookup basic data of all followers of accounts
+```{r}
+### test select 100000 accounts and lookup for users as vector
+## followers_list <- top_n(followers_list, 100000)
+followers_list <- as.vector(unlist(followers_list))
+```
+
+```{r}
+## Get all followers user data
+### split followers list into chunks
+chunk <- function(x,n)
+{
+        f <- sort(rep(1:(trunc(length(x)/n)+1),n))[1:length(x)]
+        return(split(x,f))
+}
+### get the list of users
+users <- followers_list
+### set API limit of chunks (90000 for lookup_users)
+limit <- 90000
+### create chunks equal to limit size
+chunks <-chunk(users,limit)
+### lenght of chunks
+n <- length(chunks)
+### create data vector with length of chunks
+data <- vector("list", n)
+### estimate time for running the loop. Aprox 360K per hour
+cat("This loop will take ", n/4, "hours, ending ", format(Sys.time()+n*900, "%a %b %d %X %Y"))
+### execute for loop in chunks and sleep
+for (i in seq_along(chunks)) {
+        data[[i]] <- lookup_users(chunks[[i]])
+        ## print progress and sleep 15 minutes
+        cat(i, "/", n, " ", sep = "")
+        Sys.sleep(900)
+}
+### END LOOP
+## finish notice
+cat("loop finished at", format(Sys.time(), "%a %b %d %X %Y"))
+```
+
+Put all together
+```{r}
+### bind list
+user_followers_df <- rbindlist(data)
+
+```
+
+
+Saving files for future use
+```{r}
+file.name <- paste0(followers_folder, "followers_df.rdata")
+save(user_followers_df, file = file.name)
+```
+
+
+Clean up variables
+```{r}
+## Clean. Remove variables
+rm(users, user_followers, file.name, i, n, limit, chunk, chunks, n, data, user_followers_df)
+```
+

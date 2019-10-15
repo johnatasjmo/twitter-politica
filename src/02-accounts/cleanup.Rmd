@@ -1,0 +1,21 @@
+---
+title: "cleanup"
+author: "Johnatas Montezuma"
+date: "10/10/2019"
+output: html_document
+---
+
+# Clean up accounts
+
+##  remove lists
+```{r}
+rm(blogs, congress_peru, government, interest_groups, journalists, media, politicians)
+```
+
+
+## remove accounts variables
+```{r}
+#
+rm(accounts, accounts_summary, accounts_summary_df)
+```
+

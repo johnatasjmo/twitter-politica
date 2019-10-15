@@ -1,0 +1,42 @@
+---
+title: "followers_df"
+author: "Johnatas Montezuma"
+date: "10/8/2019"
+output: html_document
+---
+
+This file reads all Rds files with accounts followers, removes duplicates and saves the list.
+
+## read all files and make a full list
+```{r}
+# move to data_followers
+setwd(data_followers)
+files <- list.files(pattern = ".Rds")
+# this process takes a few minutes
+followers_list <- files %>%
+        map(readRDS) %>% # read all files
+        rbindlist() # combine all lists
+```
+
+## remove duplicates from lists
+```{r}
+### print total number of followers
+cat("Total number of followers", 
+    format(nrow(followers_list),big.mark=",", trim=TRUE), ".")
+### remove duplicates
+followers_list <- unique(followers_list)
+### print total number of unique followers
+cat("Total number of unique followers", 
+    format(nrow(followers_list),big.mark=",", trim=TRUE), ".")
+### save the follower list
+saveRDS(followers_list, file= paste0(data, "/followers_list.Rds"))
+```
+
+Remove variables and go back to root
+```{r}
+rm(files,followers_list)
+setwd(root)
+```
+
+RESULTS
+Total number of followers 28,891,688 .Total number of unique followers 6,159,120.

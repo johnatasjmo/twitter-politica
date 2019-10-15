@@ -1,0 +1,32 @@
+---
+title: "congress_summary"
+author: "Johnatas Montezuma"
+date: "10/7/2019"
+output: html_document
+---
+
+## Congress summary
+```{r}
+# subset congress
+congress_users <- accounts_summary_df %>%
+        select(screen_name, followers_count, type) %>%
+        filter(type == "Congress")
+# Rank based on followers
+followers_rank <- frank(congress_users, -followers_count, ties.method = 'average')
+congress_users$followers_rank <- followers_rank
+congress_users <- congress_users %>%
+        arrange(congress_users$followers_rank)
+        
+#congress user with most followers
+congress_top_followers <- congress_users %>%
+        arrange(followers_rank) %>%
+        head(n = 10)
+#congress user with less followers
+congress_bottom_followers <- congress_users %>%
+        arrange(followers_rank) %>%
+        tail(n = 10)
+#congress median followers
+### TODO ###
+#congress average followers
+### TODO ###
+```

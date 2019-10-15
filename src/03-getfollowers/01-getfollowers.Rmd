@@ -1,0 +1,85 @@
+---
+title: "getfollowers2"
+author: "Johnatas Montezuma"
+date: "10/8/2019"
+output: html_document
+editor_options: 
+  chunk_output_type: inline
+---
+
+
+set folders
+```{r}
+# followers folder in data
+followers_folder <-paste0(root, "/data/followers")
+## data_followers in data/followers where all users followers will be saved
+data_followers <- paste0(followers_folder, "/data_followers")
+```
+
+
+read followers list
+```{r}
+accounts <- readRDS(paste0(data, "/accounts.Rds"))
+length(accounts)
+```
+
+
+List accounts and save a csv file
+```{r}
+### list accounts
+# test accounts
+# test_accounts <- c("johnatasjmo", "ElPeruPrimero1", "yderepente", "angeluisvalb")
+# accounts <- test_accounts
+### save accounts as csv
+file.name <- paste0("/accounts.csv")
+write.csv(accounts, file = paste0(followers_folder, file.name), row.names = FALSE)
+rm(file.name)
+```
+
+Accounts done and accounts left
+```{r}
+# first check if there's any list of followers already downloaded to 'outfolder'
+accounts.done <- gsub(".Rds", "", list.files(paste0(data_followers)))
+accounts.left <- accounts[accounts %in% accounts.done == FALSE]
+# print message total accounts, accounts done and accounts left
+cat("Total accounts=", length(accounts),".", "Accounts done=", length(accounts.done),".", "Accounts left=" , length(accounts.left), "."  ) 
+```
+
+
+Collect files
+# start
+```{r}
+# run all and read after
+print(Sys.time())
+### start collecting
+while (length(accounts.left) > 0){
+
+        # sample randomly one account to get followers
+        new.user <- sample(accounts.left, 1)
+        #new.user <- accounts.left[1]
+        cat(new.user, "---", 
+            " followers --- ", length(accounts.left), " accounts left!\n")
+
+        # download followers (with some exception handling...)
+        error <- tryCatch(followers <- getFollowers(screen_name=new.user,
+                                                    oauth=oauth_folder, sleep=0.5, verbose=FALSE), error=function(e) e)
+        if (inherits(error, 'error')) {
+                cat("Error! On to the next one...")
+                next
+        }
+
+        # save to file and remove from lists of "accounts.left"
+        ### convert followers to data.frame for easy handle later
+        followers <- as.data.frame(followers)
+        ### file name to be saved
+        file.name <- paste0(data_followers, "/", new.user, ".Rds")
+        saveRDS(followers, file=file.name)
+        accounts.left <- accounts.left[-which(accounts.left %in% new.user)]
+
+}
+```
+
+Remove variables
+```{r}
+rm(accounts.done, accounts.left, error, file.name, new.user)
+```

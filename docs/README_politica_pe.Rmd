@@ -1,0 +1,15 @@
+---
+title: "README_politica_pe"
+author: "Johnatas Montezuma"
+date: "10/6/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Folders
+* docs: all documentation
+* data: raw and processed
+* 
