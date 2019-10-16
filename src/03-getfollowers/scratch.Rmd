@@ -1,0 +1,18 @@
+
+### Scratch
+
+Convert NA values to 0
+```{r}
+## columns names of columns with with NA values
+columns_with_na <- names(select(accounts_summary, contains("_count")))
+## reemplace columns with NA values with 0
+accounts_summary[columns_with_na][is.na(accounts_summary[columns_with_na])] <- 0
+## clean variables
+rm(columns_with_na)
+```
+
+Select only relevant columns
+```{r}
+accounts_summary_df <- accounts_summary %>%
+        select(user_id, screen_name, name, location, description, followers_count, friends_count, statuses_count, account_created_at)
+```

@@ -18,14 +18,45 @@ followers_list <- readRDS(paste0(data_folder, "/followers_list.Rds"))
 followers_list <- as.vector(unlist(followers_list))
 ```
 
+
+How long is the followers_list?
 ```{r}
-## Get all followers user data
-### split followers list into chunks
+prettyNum(length(followers_list), big.mark = ",") 
+#### 6,159,120
+```
+
+create function for chunk
+```{r}
+### this function receives a list and divides it into lists of n length
 chunk <- function(x,n)
 {
         f <- sort(rep(1:(trunc(length(x)/n)+1),n))[1:length(x)]
         return(split(x,f))
 }
+```
+
+
+split follower list in batches of 3 hours each
+```{r}
+batch.size <- 1080000
+batches <- chunk(followers_list, n = batch.size)
+### assign a variable to each batch
+batch1 <- batches[[1]]
+batch2 <- batches[[2]]
+batch3 <- batches[[3]]
+batch4 <- batches[[4]]
+batch5 <- batches[[5]]
+batch6 <- batches[[6]]
+## clean up
+rm(batches, batch.size)
+```
+
+
+
+```{r}
+## Get all followers user data
+### split followers list into chunks
+
 ### get the list of users
 users <- followers_list
 ### set API limit of chunks (90000 for lookup_users)
