@@ -47,28 +47,40 @@ batch3 <- batches[[3]]
 batch4 <- batches[[4]]
 batch5 <- batches[[5]]
 batch6 <- batches[[6]]
+## save batches
+saveRDS(batch1, file = paste0(data_folder, "/tmp/batch1.Rds"))
+saveRDS(batch2, file = paste0(data_folder, "/tmp/batch2.Rds"))
+saveRDS(batch3, file = paste0(data_folder, "/tmp/batch3.Rds"))
+saveRDS(batch4, file = paste0(data_folder, "/tmp/batch4.Rds"))
+saveRDS(batch5, file = paste0(data_folder, "/tmp/batch5.Rds"))
+saveRDS(batch6, file = paste0(data_folder, "/tmp/batch6.Rds"))
+## remove batches to release R memory
+rm(batch2, batch3, batch4, batch5, batch6)
 ## clean up
 rm(batches, batch.size)
 ```
 
 
-
+### Read batches and lookup_users for each batch
+Read batch1, repeat until the last batch
 ```{r}
-## Get all followers user data
-### split followers list into chunks
+batch3 <- readRDS(paste0(data_folder, "/tmp/batch3.Rds"))
+```
 
-### get the list of users
-users <- followers_list
+Get followers data for each batch
+```{r}
+### get the list of users per batch. Start with batch1 until batchX
+users <- batch3
 ### set API limit of chunks (90000 for lookup_users)
 limit <- 90000
 ### create chunks equal to limit size
 chunks <-chunk(users,limit)
 ### lenght of chunks
 n <- length(chunks)
-### create data vector with length of chunks
+### create data vector with length of chunks change data1, 2, 3 each time
 data <- vector("list", n)
 ### estimate time for running the loop. Aprox 360K per hour
-cat("This loop will take ", n/4, "hours, ending ", format(Sys.time()+n*900, "%a %b %d %X %Y"))
+cat("This loop will take ", n/3, "hours, ending ", format(Sys.time()+n*900, "%a %b %d %X"))
 ### execute for loop in chunks and sleep
 for (i in seq_along(chunks)) {
         data[[i]] <- lookup_users(chunks[[i]])
@@ -77,15 +89,20 @@ for (i in seq_along(chunks)) {
         Sys.sleep(900)
 }
 ### END LOOP
+rm(i, n, limit, chunks, users)
 ## finish notice
 cat("loop finished at", format(Sys.time(), "%a %b %d %X %Y"))
 ```
 
-Put all together
+Put all together - change data name, where batch1 becomes data1
 ```{r}
-### bind list
-user_followers_df <- rbindlist(data)
+batch2_data <- data
+rm(data) # removing data for future use
+```
 
+### save files for future use
+```{r}
+saveRDS(batch2_data, file = paste0(data_folder, "/tmp/batch2_data.Rds"))
 ```
 
 
