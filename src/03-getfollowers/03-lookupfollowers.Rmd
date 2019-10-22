@@ -1,121 +1,100 @@
 ---
-title: "lookupfollowers"
+title: "GetBatchUsers"
 author: "Johnatas Montezuma"
 date: "10/11/2019"
 output: html_document
 ---
 
+We need to read the full followers list, split into sizable chunks of 1 or 2 hours and call getBatchUsers function. The script will save the batches in tmp folder and read the processed information.
+Final output is a followers_summary data table with basic twitter information from users.
+
 # Load followers_list
 ```{r}
 followers_list <- readRDS(paste0(data_folder, "/followers_list.Rds"))
+followers_list <- top_n(followers_list, 2000000) ## select a shorter sample
 ```
-
-
-# Lookup basic data of all followers of accounts
+Set as character for using getBatchUser function
 ```{r}
-### test select 100000 accounts and lookup for users as vector
-## followers_list <- top_n(followers_list, 100000)
-followers_list <- as.vector(unlist(followers_list))
+followers_list  <- followers_list %>%
+  as.matrix() %>%  
+  c() 
 ```
 
 
 How long is the followers_list?
 ```{r}
-prettyNum(length(followers_list), big.mark = ",") 
-#### 6,159,120
+prettyNum(length(followers_list), big.mark = ",")
 ```
 
-create function for chunk
+split follower list in batches
 ```{r}
-### this function receives a list and divides it into lists of n length
-chunk <- function(x,n)
-{
-        f <- sort(rep(1:(trunc(length(x)/n)+1),n))[1:length(x)]
-        return(split(x,f))
-}
-```
-
-
-split follower list in batches of 3 hours each
-```{r}
-batch.size <- 1080000
+batch.size <- 360000 ### aprox 360K per hour
 batches <- chunk(followers_list, n = batch.size)
-### assign a variable to each batch
-batch1 <- batches[[1]]
-batch2 <- batches[[2]]
-batch3 <- batches[[3]]
-batch4 <- batches[[4]]
-batch5 <- batches[[5]]
-batch6 <- batches[[6]]
-## save batches
-saveRDS(batch1, file = paste0(data_folder, "/tmp/batch1.Rds"))
-saveRDS(batch2, file = paste0(data_folder, "/tmp/batch2.Rds"))
-saveRDS(batch3, file = paste0(data_folder, "/tmp/batch3.Rds"))
-saveRDS(batch4, file = paste0(data_folder, "/tmp/batch4.Rds"))
-saveRDS(batch5, file = paste0(data_folder, "/tmp/batch5.Rds"))
-saveRDS(batch6, file = paste0(data_folder, "/tmp/batch6.Rds"))
-## remove batches to release R memory
-rm(batch2, batch3, batch4, batch5, batch6)
-## clean up
-rm(batches, batch.size)
+rm(batch.size)
 ```
 
-
-### Read batches and lookup_users for each batch
-Read batch1, repeat until the last batch
+Save each batch from batch.size as single Rds file
 ```{r}
-batch3 <- readRDS(paste0(data_folder, "/tmp/batch3.Rds"))
-```
-
-Get followers data for each batch
-```{r}
-### get the list of users per batch. Start with batch1 until batchX
-users <- batch3
-### set API limit of chunks (90000 for lookup_users)
-limit <- 90000
-### create chunks equal to limit size
-chunks <-chunk(users,limit)
-### lenght of chunks
-n <- length(chunks)
-### create data vector with length of chunks change data1, 2, 3 each time
-data <- vector("list", n)
-### estimate time for running the loop. Aprox 360K per hour
-cat("This loop will take ", n/3, "hours, ending ", format(Sys.time()+n*900, "%a %b %d %X"))
-### execute for loop in chunks and sleep
-for (i in seq_along(chunks)) {
-        data[[i]] <- lookup_users(chunks[[i]])
-        ## print progress and sleep 15 minutes
-        cat(i, "/", n, " ", sep = "")
-        Sys.sleep(900)
+## loop for saving batches
+for(i in 1:length(batches))
+  {
+    saveRDS(batches[[i]], file = paste0(data_folder, "/tmp/batch", i, ".Rds"))
 }
-### END LOOP
-rm(i, n, limit, chunks, users)
-## finish notice
-cat("loop finished at", format(Sys.time(), "%a %b %d %X %Y"))
 ```
 
-Put all together - change data name, where batch1 becomes data1
+Clean up
 ```{r}
-batch2_data <- data
-rm(data) # removing data for future use
+### remove i and batches (as they are saved in tmp)
+rm(i, batches)
+```
+                
+Read files in tmp folder
+```{r}
+### read all files in tmp folder
+batches_list <- list.files(paste0(data_folder,"/tmp"), full.names = TRUE)
 ```
 
-### save files for future use
+For each batch, getUsersBatch and save as RDS
 ```{r}
-saveRDS(batch2_data, file = paste0(data_folder, "/tmp/batch2_data.Rds"))
+### loop for each batch
+for(i in 1:length(batches_list))
+  {
+   users <- readRDS(batches_list[[i]])
+   data <- getUsersBatch(ids = users, oauth = my_oauth)
+### save as RDS
+saveRDS(data, file = paste0(data_folder, "/tmp/batch", i, "_data.Rds"))
+}
+```
+
+clean up
+```{r}
+## clean up
+rm(batches_list, i, users, data)
 ```
 
 
-Saving files for future use
+
+Read all and make  a list
 ```{r}
-file.name <- paste0(followers_folder, "followers_df.rdata")
-save(user_followers_df, file = file.name)
+## read all files and make a full list
+files <- list.files(path = paste0(data_folder, "/tmp"), pattern ="_data.Rds", full.names = TRUE)
+# this process takes a few minutes
+followers_summary <- files %>%
+        map(readRDS) %>% # read all files
+        rbindlist() # combine all lists
 ```
 
-
-Clean up variables
+Save as followers_summary in RDS in data
 ```{r}
-## Clean. Remove variables
-rm(users, user_followers, file.name, i, n, limit, chunk, chunks, n, data, user_followers_df)
+saveRDS(followers_summary, paste0(data_folder, "/followers_summary.Rds"))
+```
+
+Clean up variables and delete files
+```{r}
+rm(files, followers_list, followers_summary)
+### remove files in tmp
+files_to_delete <- list.files(paste0(data_folder, "/tmp"), full.names = TRUE) 
+unlink(files_to_delete) ## deletes all files in tmp
+rm(files_to_delete)
 ```
 
