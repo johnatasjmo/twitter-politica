@@ -28,7 +28,7 @@ prettyNum(length(followers_list), big.mark = ",")
 
 split follower list in batches
 ```{r}
-batch.size <- 360000 ### aprox 360K per hour
+batch.size <- 360000 ### aprox 80K per hour, 4.5h
 batches <- chunk(followers_list, n = batch.size)
 rm(batch.size)
 ```
