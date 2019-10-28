@@ -5,13 +5,13 @@ date: "10/11/2019"
 output: html_document
 ---
 
-We need to read the full followers list, split into sizable chunks of 1 or 2 hours and call getBatchUsers function. The script will save the batches in tmp folder and read the processed information.
+We need to read the full followers list, split into sizable chunks of 4 hours and call getBatchUsers function. The script will save the batches in tmp folder and read the processed information.
 Final output is a followers_summary data table with basic twitter information from users.
 
 # Load followers_list
 ```{r}
 followers_list <- readRDS(paste0(data_folder, "/followers_list.Rds"))
-followers_list <- top_n(followers_list, 2000000) ## select a shorter sample
+### followers_list <- top_n(followers_list, 2000000) ## select a shorter sample
 ```
 Set as character for using getBatchUser function
 ```{r}
@@ -28,7 +28,7 @@ prettyNum(length(followers_list), big.mark = ",")
 
 split follower list in batches
 ```{r}
-batch.size <- 360000 ### aprox 80K per hour, 4.5h
+batch.size <- 180000 ### aprox 180K per hour, 2h
 batches <- chunk(followers_list, n = batch.size)
 rm(batch.size)
 ```
@@ -51,7 +51,7 @@ rm(i, batches)
 Read files in tmp folder
 ```{r}
 ### read all files in tmp folder
-batches_list <- list.files(paste0(data_folder,"/tmp"), full.names = TRUE)
+batches_list <- list.files(paste0(data_folder,"/tmp"), full.names = TRUE, pattern = "batch")
 ```
 
 For each batch, getUsersBatch and save as RDS
@@ -64,6 +64,13 @@ for(i in 1:length(batches_list))
 ### save as RDS
 saveRDS(data, file = paste0(data_folder, "/tmp/batch", i, "_data.Rds"))
 }
+```
+
+WIP - get batch number
+```{r}
+batch.path <- batches_list[[i]]
+### get batch number
+batch.number <- unlist(regmatches(x = batch.path,mgregexpr("[0-9]+",text = batch.path)))
 ```
 
 clean up

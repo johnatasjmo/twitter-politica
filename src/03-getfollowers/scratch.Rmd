@@ -16,3 +16,28 @@ Select only relevant columns
 accounts_summary_df <- accounts_summary %>%
         select(user_id, screen_name, name, location, description, followers_count, friends_count, statuses_count, account_created_at)
 ```
+
+Move file to another directory
+```{r}
+library(filesstrings)
+file.move("C:/path/to/file/some_file.txt", "C:/some/other/path")
+```
+
+
+REPLACE formula in 03-lookupfollowers
+```{r}
+### loop for each batch
+for(i in 1:length(batches_list))
+  {
+        # set batch path
+        batch.file <- batches_list[[i]] 
+        # get batch number
+        batch.number <- unlist(regmatches(x = batch.file,mgregexpr("[0-9]+",text = batch.file))) 
+        users <- readRDS(batch.file)       
+        data <- getUsersBatch(ids = users, oauth = my_oauth)
+        # save as Rds in processed folder
+        saveRDS(data, file = paste0(data_folder, "/processed", batch.number, "_data.Rds"))
+        # move file to a done folder
+        file.move(batch.file , paste0(data_folder, "/batches_done"))
+}
+```

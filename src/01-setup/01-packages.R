@@ -9,7 +9,8 @@ toInstall <- c(
 		"here",
 		"rvest",
 		"plyr",
-		"data.table"
+		"data.table",
+		"filesstrings"
 )
 
 if(doInstall){
