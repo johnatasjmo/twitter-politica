@@ -1,0 +1,45 @@
+---
+title: "Analyze followers"
+author: "Johnatas Montezuma"
+date: "10/11/2019"
+output: html_document
+---
+
+Analyze all followers basic data from `followers_summary'
+
+Read followers summary
+```{r}
+followers_summary <- readRDS(paste0(data_folder, "/followers_summary.Rds"))
+```
+
+Keep only unique data based on id_str
+```{r}
+# my_data %>% distinct(Sepal.Length, .keep_all = TRUE)
+followers_summary <- followers_summary %>%
+        distinct(id_str, .keep_all = TRUE)
+```
+
+
+Convert created at to a simple date format
+```{r}
+followers_summary <-  followers_summary %>%
+        mutate(created_date = as.Date(followers_summary$created_at, format="%a %b %d %H:%M:%S %z %Y")) %>%
+        mutate(created_at = NULL)
+```
+
+
+
+
+
+
+## WIP ####
+## scratch a sample
+```{r}
+followers_summaryTest <- head(followers_summary, 400)
+followers_summaryTestDateFixed <-  followers_summaryTest %>%
+        mutate(created_date = as.Date(followers_summaryTest$created_at, format="%a %b %d %H:%M:%S %z %Y")) %>%
+        mutate(created_at = NULL)
+        
+```
+
+

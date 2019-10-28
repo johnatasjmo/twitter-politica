@@ -105,6 +105,7 @@ rm(files, followers_list, followers_summary)
 ### remove files in tmp
 files_to_delete <- list.files(paste0(data_folder, "/tmp"), full.names = TRUE) 
 unlink(files_to_delete) ## deletes all files in tmp
+files_to_delete <- list.files(paste0())
 rm(files_to_delete)
 ```
 
