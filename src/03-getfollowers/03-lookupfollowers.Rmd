@@ -59,32 +59,32 @@ For each batch, getUsersBatch and save as RDS
 ### loop for each batch
 for(i in 1:length(batches_list))
   {
-   users <- readRDS(batches_list[[i]])
-   data <- getUsersBatch(ids = users, oauth = my_oauth)
-### save as RDS
-saveRDS(data, file = paste0(data_folder, "/tmp/batch", i, "_data.Rds"))
+        # set batch path
+        batch.file <- batches_list[[i]] 
+        # get batch number
+        batch.number <- unlist(regmatches(x = batch.file, gregexpr("[0-9]+",text = batch.file))) 
+        users <- readRDS(batch.file)       
+        data <- getUsersBatch(ids = users, oauth = my_oauth)
+        # save as Rds in processed folder
+        saveRDS(data, file = paste0(data_folder, "/processed/batch", batch.number, "_data.Rds"))
+        # move file to a done folder
+        file.move(batch.file , paste0(data_folder, "/batches_done"))
 }
 ```
 
-WIP - get batch number
-```{r}
-batch.path <- batches_list[[i]]
-### get batch number
-batch.number <- unlist(regmatches(x = batch.path,mgregexpr("[0-9]+",text = batch.path)))
-```
 
 clean up
 ```{r}
 ## clean up
-rm(batches_list, i, users, data)
+rm(batches_list, i, users, data, batch.file, batch.number)
 ```
 
 
 
-Read all and make  a list
+Read all processed folerand make  a list
 ```{r}
 ## read all files and make a full list
-files <- list.files(path = paste0(data_folder, "/tmp"), pattern ="_data.Rds", full.names = TRUE)
+files <- list.files(path = paste0(data_folder, "/processed"), pattern ="_data.Rds", full.names = TRUE)
 # this process takes a few minutes
 followers_summary <- files %>%
         map(readRDS) %>% # read all files
@@ -96,9 +96,12 @@ Save as followers_summary in RDS in data
 saveRDS(followers_summary, paste0(data_folder, "/followers_summary.Rds"))
 ```
 
-Clean up variables and delete files
+Clean up variables
 ```{r}
 rm(files, followers_list, followers_summary)
+```
+
+```{r}
 ### remove files in tmp
 files_to_delete <- list.files(paste0(data_folder, "/tmp"), full.names = TRUE) 
 unlink(files_to_delete) ## deletes all files in tmp
