@@ -13,6 +13,7 @@ data_folder <- paste0(root, "/data")
 ## create followers and data_followers directory
 dir.create(file.path(data_folder, "/followers"))
 dir.create(file.path(data_folder, "/followers/data_followers"))
+dir.create(file.path(data_folder, "/tmp"))
 
 ## set working directory as root
 setwd(root)

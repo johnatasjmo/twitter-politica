@@ -7,7 +7,7 @@ Get basic infomation of all accounts
 ```{r}
 ## accounts summary
 ### read accounts
-accounts <- readRDS(paste0(data, "/accounts.Rds"))
+accounts <- readRDS(paste0(data_folder, "/accounts.Rds"))
 ### lookup all basic data
 accounts_summary <- lookup_users(accounts)
 ## columns names of columns with with NA values
@@ -27,7 +27,7 @@ accounts_summary_df <- accounts_summary %>%
 Add type
 ```{r}
 accounts_summary_df$type <- NA
-accounts_summary_df$type[accounts_summary_df$screen_name %in% congress_peru] <- "Congress"
+#accounts_summary_df$type[accounts_summary_df$screen_name %in% congress_peru] <- "Congress"
 accounts_summary_df$type[accounts_summary_df$screen_name %in% journalists] <- "Journalists"
 accounts_summary_df$type[accounts_summary_df$screen_name %in% politicians] <- "Politicians"
 accounts_summary_df$type[accounts_summary_df$screen_name %in% government] <- "Government"
@@ -38,9 +38,9 @@ accounts_summary_df$type[accounts_summary_df$screen_name %in% interest_groups] <
 
 Write and read csv table
 ```{r}
-saveRDS(accounts_summary_df, file = paste0(data, "/accounts_summary.Rds"))
+saveRDS(accounts_summary_df, file = paste0(data_folder, "/accounts_summary.Rds"))
 ### save as csv for easy reading
-write_csv(accounts_summary_df, paste0(data, "/accounts_summary.csv"))
+write_csv(accounts_summary_df, paste0(data_folder, "/accounts_summary.csv"))
 ```
 
 
