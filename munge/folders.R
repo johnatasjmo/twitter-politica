@@ -10,11 +10,15 @@ oauth_folder <- paste0(root, "/config/twitter")
 ## set data folder
 data_folder <- paste0(root, "/data")
 
+## create followers and data_followers directory
+dir.create(file.path(data_folder, "/followers"))
+dir.create(file.path(data_folder, "/followers/data_followers"))
+dir.create(file.path(data_folder, "/tmp"))
+dir.create(file.path(data_folder, "/processed"))
+dir.create(file.path(data_folder, "/batches_done"))
+
 ## set working directory as root
 setwd(root)
-
-## remove project variables
-rm(config, project.info)
 
 
 

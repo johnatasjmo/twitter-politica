@@ -2,7 +2,6 @@
 .config/twitter/my_oauth.Rdata
 cache/
 data/
-.here
 politica_pe.Rproj
 twitter-politica.Rproj
 
@@ -45,4 +44,6 @@ vignettes/*.pdf
 # Temporary files created by R markdown
 *.utf8.md
 *.knit.md
+
+# Mac files
 .DS_Store

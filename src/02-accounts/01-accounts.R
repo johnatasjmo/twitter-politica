@@ -1,7 +1,7 @@
 # Create a list of political relevant accounts
 
 # Congress Peru
-congress_peru <- c("Pedro_Olaechea", "rosamariabartra", "KarinaBeteta01", "SalvadorHeresi", "josemarvinpalma")
+# congress_peru <- c("Pedro_Olaechea", "rosamariabartra", "KarinaBeteta01", "SalvadorHeresi", "josemarvinpalma")
 
 ## media
 media <- c("peru21politica", "RPPNoticias", "larepublica_pe", "Caretas", "ensustrece", "Politica_ECpe", "Politica_LR", "exitosape", "PanoramaPTV", "IDL_R")
@@ -23,10 +23,11 @@ blogs <- c("lamula", "uterope")
 # interest groups
 interest_groups <- c("Ideele", "Ojo_Publico")
 
-accounts <- unique(c(congress_peru, media, politicians, government, journalists, blogs, interest_groups))
+## add congress_peru after elections
+accounts <- unique(c(media, politicians, government, journalists, blogs, interest_groups))
 cat("Total number of accounts ", length(accounts))
 View(accounts)
 
 ## Save as RDS in Data
-saveRDS(accounts, file = paste0(data, "/accounts.Rds"))
+saveRDS(accounts, file = "data/accounts.Rds")
 # rm(accounts)

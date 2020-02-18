@@ -29,7 +29,7 @@ followers_list <- unique(followers_list)
 cat("Total number of unique followers", 
     format(nrow(followers_list),big.mark=",", trim=TRUE), ".")
 ### save the follower list
-saveRDS(followers_list, file= paste0(data, "/followers_list.Rds"))
+saveRDS(followers_list, file= paste0(data_folder, "/followers_list.Rds"))
 ```
 
 Remove variables and go back to root
