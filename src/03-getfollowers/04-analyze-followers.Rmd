@@ -27,8 +27,35 @@ followers_summary <-  followers_summary %>%
         mutate(created_at = NULL)
 ```
 
+check users with top followers
+```{r}
+top_10_followers <- followers_summary %>% top_n(50, followers_count)
+```
+
+library(stringr)
+top10_followers %>% 
+    filter(str_detect(location, '\\b(River|Creek)\\b'))
+
+followers_Peru<- followers_summary %>%
+     filter(str_detect(location, "(Peru|Perú)"))
+     
+followers_Peru <- followers_Peru %>%
+        top_n(1000, followers_count)
+        
+
+library(dplyr)
+ df1 %>% 
+     group_by(from) %>%
+     filter(n_distinct(number)>1)
 
 
+followers_listSample <- sample_n(followers_list, 500000)
+## test selecting only that repeat 3 times
+```{r}
+TableSample1 <- followers_listSample %>%
+    group_by(followers) %>%
+    table()
+```
 
 
 
@@ -43,3 +70,17 @@ followers_summaryTestDateFixed <-  followers_summaryTest %>%
 ```
 
 
+## graph
+## https://analyticsprofile.com/r-statistics-course/chapter-1-single-variable-analysis-in-r/
+```{r}
+library(beeswarm)
+followers_count <- followers_summary$followers_count
+beeswarm(followers_count)
+```
+
+
+boxplot(followers_count, horizontal=TRUE)
+
+## top values
+library(dplyr)
+top10_final_subset2 = final_subset %>% group_by(u_id) %>% top_n(10,lift)
