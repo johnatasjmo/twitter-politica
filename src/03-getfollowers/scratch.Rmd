@@ -41,3 +41,20 @@ for(i in 1:length(batches_list))
         file.move(batch.file , paste0(data_folder, "/batches_done"))
 }
 ```
+
+
+### select only followers with more 
+
+```{r}
+## Test grouping
+followers_list_grouped <- followers_list %>%
+  group_by(followers)
+## test more than x following
+followers_list_3more <- followers_list_grouped %>%
+  filter(n()>3) 
+## sort
+## x <- sort(table(yourdata),decreasing=T)
+followers_list_table <- sort(table(followers_list_table), decreasing = TRUE)
+
+```
+
